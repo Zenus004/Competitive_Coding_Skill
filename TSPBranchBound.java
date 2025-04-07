@@ -38,8 +38,8 @@ public class TSPBranchBound {
     public static void main(String[] args) {
         int[][] costMatrix = {
                 { 0, 10, 15, 20 },
-                { 10, 0, 35, 25 },
-                { 15, 35, 0, 30 },
+                { 10, 0, 0, 25 },
+                { 15, 15, 0, 30 },
                 { 20, 25, 30, 0 }
         };
 

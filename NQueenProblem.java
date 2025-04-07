@@ -1,86 +1,70 @@
 import java.util.Scanner;
 
 public class NQueenProblem {
-    private int N;
-    private int[][] board;
 
-    public NQueenProblem(int N) {
-        this.N = N;
-        this.board = new int[N][N];
+    // Function to print the board
+    public static void printBoard(int[][] board, int n) {
+        for(int i=0; i<n; i++) {
+            for(int j=0; j<n; j++) {
+                System.out.print((board[i][j] == 1 ? "Q " : ". "));
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 
-    // Function to check if a queen can be placed at board[row][col]
-    private boolean isSafe(int row, int col) {
-        // Check this column on the upper side
-        for (int i = 0; i < row; i++) {
-            if (board[i][col] == 1) {
+    // Function to check if queen can be placed
+    public static boolean isSafe(int[][] board, int row, int col, int n) {
+        // Check column
+        for(int i=0; i<row; i++) {
+            if(board[i][col] == 1)
                 return false;
-            }
         }
 
-        // Check upper diagonal on the left side
-        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--) {
-            if (board[i][j] == 1) {
+        // Check left diagonal
+        for(int i=row-1, j=col-1; i>=0 && j>=0; i--, j--) {
+            if(board[i][j] == 1)
                 return false;
-            }
         }
 
-        // Check upper diagonal on the right side
-        for (int i = row, j = col; i >= 0 && j < N; i--, j++) {
-            if (board[i][j] == 1) {
+        // Check right diagonal
+        for(int i=row-1, j=col+1; i>=0 && j<n; i--, j++) {
+            if(board[i][j] == 1)
                 return false;
-            }
         }
 
         return true;
     }
 
-    // Recursive function to solve N-Queen problem
-    private boolean solveNQueenUtil(int row) {
-        if (row >= N) {
+    // Backtracking Function to solve N-Queen
+    public static boolean solveNQueen(int[][] board, int row, int n) {
+        if(row == n) {
+            printBoard(board, n);
             return true;
         }
 
-        for (int col = 0; col < N; col++) {
-            if (isSafe(row, col)) {
+        boolean res = false;
+        for(int col=0; col<n; col++) {
+            if(isSafe(board, row, col, n)) {
                 board[row][col] = 1;
-
-                if (solveNQueenUtil(row + 1)) {
+                if(solveNQueen(board, row+1, n))   // Direct return if solution found
                     return true;
-                }
-
-                board[row][col] = 0; // Backtrack
+                board[row][col] = 0;
             }
         }
-        return false;
-    }
-
-    // Function to solve N-Queen and print the solution
-    public void solveNQueen() {
-        if (!solveNQueenUtil(0)) {
-            System.out.println("No solution exists");
-            return;
-        }
-        printBoard();
-    }
-
-    // Function to print the board
-    private void printBoard() {
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                System.out.print((board[i][j] == 1 ? "Q " : "- "));
-            }
-            System.out.println();
-        }
+        return res;
     }
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        System.out.print("Enter the value of N: ");
-        int N = sc.nextInt();
-        sc.close();
 
-        NQueenProblem queenSolver = new NQueenProblem(N);
-        queenSolver.solveNQueen();
+        System.out.print("Enter value of N (number of Queens): ");
+        int n = sc.nextInt();
+
+        int[][] board = new int[n][n];
+
+        if(!solveNQueen(board, 0, n)) {
+            System.out.println("Solution doesn't exist");
+        }
     }
 }

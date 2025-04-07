@@ -2,9 +2,10 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 class Job {
-    int id, deadline, profit;
+    String id;
+    int deadline, profit;
 
-    public Job(int id, int deadline, int profit) {
+    Job(String id, int deadline, int profit) {
         this.id = id;
         this.deadline = deadline;
         this.profit = profit;
@@ -12,61 +13,57 @@ class Job {
 }
 
 public class JobSequencing {
-    // Function to schedule jobs to maximize profit
+
     public static void jobSequencing(Job[] jobs, int n) {
-        // Sort jobs in descending order of profit
+        // Sort jobs in decreasing order of profit
         Arrays.sort(jobs, (a, b) -> b.profit - a.profit);
 
         int maxDeadline = 0;
-        for (Job job : jobs) {
-            maxDeadline = Math.max(maxDeadline, job.deadline);
+        for (int i = 0; i < n; i++) {
+            if (jobs[i].deadline > maxDeadline)
+                maxDeadline = jobs[i].deadline;
         }
 
-        int[] result = new int[maxDeadline + 1]; // To store job sequence
-        boolean[] slot = new boolean[maxDeadline + 1]; // To check if slot is occupied
-        Arrays.fill(result, -1);
+        String[] result = new String[maxDeadline + 1]; // 1-based indexing
+        Arrays.fill(result, "-");
 
-        int maxProfit = 0;
-        int countJobs = 0;
+        int totalProfit = 0;
 
-        for (Job job : jobs) {
-            for (int j = job.deadline; j > 0; j--) {
-                if (!slot[j]) {
-                    result[j] = job.id;
-                    slot[j] = true;
-                    maxProfit += job.profit;
-                    countJobs++;
+        for (int i = 0; i < n; i++) {
+            for (int j = jobs[i].deadline; j > 0; j--) {
+                if (result[j] == "-") {
+                    result[j] = jobs[i].id;
+                    totalProfit += jobs[i].profit;
                     break;
                 }
             }
         }
 
-        System.out.println("Jobs selected for execution:");
+        System.out.println("Job sequence for maximum profit:");
         for (int i = 1; i <= maxDeadline; i++) {
-            if (result[i] != -1) {
-                System.out.print("Job " + result[i] + " ");
-            }
+            if (!result[i].equals("-"))
+                System.out.print(result[i] + " ");
         }
-        System.out.println("\nMaximum Profit: " + maxProfit);
+
+        System.out.println("\nTotal Profit: " + totalProfit);
     }
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        System.out.print("Enter the number of jobs: ");
+        System.out.print("Enter number of jobs: ");
         int n = sc.nextInt();
 
         Job[] jobs = new Job[n];
-        System.out.println("Enter job details (ID, Deadline, Profit):");
+
+        System.out.println("Enter Job Id, Deadline, Profit for each job:");
         for (int i = 0; i < n; i++) {
-            int id = sc.nextInt();
+            String id = sc.next();
             int deadline = sc.nextInt();
             int profit = sc.nextInt();
             jobs[i] = new Job(id, deadline, profit);
         }
 
         jobSequencing(jobs, n);
-
-        sc.close();
     }
 }

@@ -1,80 +1,76 @@
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
+import java.util.*;
 
 class RottenOranges {
-    static class Cell {
+
+    static class Point {
         int x, y, time;
-        Cell(int x, int y, int time) {
+
+        Point(int x, int y, int time) {
             this.x = x;
             this.y = y;
             this.time = time;
         }
     }
 
-    private static int minTimeToRot(int[][] grid) {
-        int rows = grid.length;
-        int cols = grid[0].length;
-        Queue<Cell> queue = new LinkedList<>();
-        int freshOranges = 0;
+    static int minTimeToRot(int[][] grid, int n, int m) {
+        Queue<Point> q = new LinkedList<>();
+        int fresh = 0;
 
-        // Initialize the queue with all rotten oranges and count fresh ones
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (grid[i][j] == 2) {
-                    queue.add(new Cell(i, j, 0));
-                } else if (grid[i][j] == 1) {
-                    freshOranges++;
+        // Add all rotten oranges to queue
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid[i][j] == 2)
+                    q.add(new Point(i, j, 0));
+                if (grid[i][j] == 1)
+                    fresh++;
+            }
+        }
+
+        int[] dx = {-1, 1, 0, 0};  // Up, Down
+        int[] dy = {0, 0, -1, 1};  // Left, Right
+        int time = 0;
+
+        while (!q.isEmpty()) {
+            Point curr = q.poll();
+            time = curr.time;
+
+            for (int k = 0; k < 4; k++) {
+                int nx = curr.x + dx[k];
+                int ny = curr.y + dy[k];
+
+                if (nx >= 0 && ny >= 0 && nx < n && ny < m && grid[nx][ny] == 1) {
+                    grid[nx][ny] = 2;  // Rot the fresh orange
+                    fresh--;
+                    q.add(new Point(nx, ny, curr.time + 1));
                 }
             }
         }
 
-        if (freshOranges == 0) return 0; // No fresh oranges to rot
+        if (fresh > 0)
+            return -1; // Some oranges can't rot
 
-        int[] dx = {-1, 1, 0, 0};
-        int[] dy = {0, 0, -1, 1};
-        int timeElapsed = 0;
-
-        // BFS traversal
-        while (!queue.isEmpty()) {
-            Cell cell = queue.poll();
-            int x = cell.x, y = cell.y, time = cell.time;
-            timeElapsed = Math.max(timeElapsed, time);
-
-            for (int i = 0; i < 4; i++) {
-                int newX = x + dx[i];
-                int newY = y + dy[i];
-
-                if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] == 1) {
-                    grid[newX][newY] = 2;
-                    queue.add(new Cell(newX, newY, time + 1));
-                    freshOranges--;
-                }
-            }
-        }
-
-        return (freshOranges == 0) ? timeElapsed : -1;
+        return time;
     }
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        System.out.print("Enter number of rows: ");
-        int rows = sc.nextInt();
-        System.out.print("Enter number of columns: ");
-        int cols = sc.nextInt();
+        System.out.print("Enter rows and columns: ");
+        int n = sc.nextInt();
+        int m = sc.nextInt();
 
-        int[][] grid = new int[rows][cols];
-        System.out.println("Enter grid values (0=empty, 1=fresh, 2=rotten):");
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        int[][] grid = new int[n][m];
+
+        System.out.println("Enter Grid values (0-Empty, 1-Fresh, 2-Rotten):");
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < m; j++)
                 grid[i][j] = sc.nextInt();
-            }
-        }
 
-        int result = minTimeToRot(grid);
-        System.out.println("Minimum time to rot all oranges: " + result);
+        int result = minTimeToRot(grid, n, m);
 
-        sc.close();
+        if (result == -1)
+            System.out.println("Not all oranges can rot");
+        else
+            System.out.println("Minimum time to rot all oranges: " + result);
     }
 }
